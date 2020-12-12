@@ -1,0 +1,62 @@
+{
+ "rows": 2,
+ "align": "fill",
+ "rfill": "0, 1",
+ "widgets": [
+  {
+   "cols": 8,
+   "halign": "left",
+   "border": "none",
+   "widgets": [
+    {
+     "type": "button",
+     "label": "<<",
+     "on_event": "button_first_event"
+    },
+    {
+     "type": "button",
+     "label": "<",
+     "on_event": "button_prev_event"
+    },
+    {
+     "type": "button",
+     "label": ">",
+     "on_event": "button_next_event"
+    },
+    {
+     "type": "button",
+     "label": ">>",
+     "on_event": "button_last_event"
+    },
+    {
+     "type": "label",
+     "text": "Page"
+    },
+    {
+     "type": "textbox",
+     "text": "1",
+     "size": "3",
+     "uid": "pg_nr",
+     "on_event": "load_page_event"
+    },
+    {
+     "type": "label",
+     "text": "of ?",
+     "uid": "pg_cnt"
+    },
+    {
+     "type": "textbox",
+     "size": 10,
+     "on_event": "textbox_search_event"
+    }
+   ]
+  },
+  {
+   "align": "fill",
+   "type": "pixmap",
+   "w": 200,
+   "h": 200,
+   "uid": "page"
+  }
+ ]
+}

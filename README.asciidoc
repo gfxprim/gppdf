@@ -1,0 +1,4 @@
+A minimalistic and fast pdf viewer
+==================================
+
+Based on mupdf library and gfxprim widgets.
