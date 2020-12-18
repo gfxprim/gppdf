@@ -307,7 +307,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	gp_widget *layout = gp_widget_layout_json("gppdf.json", &uids);
+	gp_widget *layout = gp_app_layout_load("gppdf", &uids);
 
 	controls.doc = &doc;
 	controls.page = gp_widget_by_uid(uids, "page", GP_WIDGET_PIXMAP);
