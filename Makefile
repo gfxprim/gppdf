@@ -1,5 +1,34 @@
 CFLAGS=-W -Wall -Wextra -O2 $(shell gfxprim-config --cflags)
 LDLIBS=-lgfxprim $(shell gfxprim-config --libs-widgets) -lmupdf
+
+OS=$(shell grep '^ID=' '/etc/os-release')
+
+ifeq ($(OS), ID=debian)
+HACK=1
+endif
+
+ifeq ($(OS), ID=raspbian)
+HACK=1
+endif
+
+ifeq ($(OS), ID=ubuntu)
+HACK=1
+endif
+
+ifdef HACK
+$(info Hacking around broken libmupdf on deb based distros!)
+LDLIBS+=-lmupdf-third -lm
+# libfreetype6
+LDLIBS+=$(shell pkg-config --libs freetype2)
+LDLIBS+=$(shell pkg-config --libs zlib)
+LDLIBS+=$(shell pkg-config --libs libopenjp2)
+LDLIBS+=$(shell pkg-config --libs libjpeg)
+# libharfbuzz0b
+LDLIBS+=$(shell pkg-config --libs harfbuzz)
+# libjbig2dec0
+LDLIBS+=-ljbig2dec
+endif
+
 BIN=gppdf
 DEP=$(BIN:=.dep)
 
