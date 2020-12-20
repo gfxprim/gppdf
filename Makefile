@@ -15,8 +15,12 @@ ifeq ($(OS), ID=ubuntu)
 HACK=1
 endif
 
+ifeq ($(OS), ID=opensuse)
+HACK=1
+endif
+
 ifdef HACK
-$(info Hacking around broken libmupdf on deb based distros!)
+$(info Hacking around static devel libraries for libmupdf!)
 LDLIBS+=-lmupdf-third -lm
 # libfreetype6
 LDLIBS+=$(shell pkg-config --libs freetype2)
