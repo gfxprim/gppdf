@@ -33,7 +33,7 @@
      "text": "Page"
     },
     {
-     "type": "textbox",
+     "type": "tbox",
      "text": "1",
      "size": "3",
      "uid": "pg_nr",
@@ -45,9 +45,9 @@
      "uid": "pg_cnt"
     },
     {
-     "type": "textbox",
+     "type": "tbox",
      "size": 10,
-     "on_event": "textbox_search_event"
+     "on_event": "tbox_search_event"
     }
    ]
   },

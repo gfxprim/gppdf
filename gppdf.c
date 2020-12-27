@@ -88,7 +88,7 @@ static void load_page(struct document *doc, int page)
 	doc->cur_page = page;
 	doc->fz_pg = fz_load_page(doc->fz_ctx, doc->fz_doc, doc->cur_page);
 
-	gp_widget_textbox_printf(controls.pg_nr, "%i", doc->cur_page+1);
+	gp_widget_tbox_printf(controls.pg_nr, "%i", doc->cur_page+1);
 }
 
 static int load_document(struct document *doc, const char *filename)
@@ -151,7 +151,7 @@ int load_page_event(gp_widget_event *ev)
 
 	switch (ev->type) {
 	case GP_WIDGET_EVENT_NEW:
-		tbox->tbox->filter = GP_TEXT_BOX_FILTER_INT;
+		tbox->tbox->filter = GP_TBOX_FILTER_INT;
 	break;
 	case GP_WIDGET_EVENT_ACTION:
 		load_page_and_redraw(atoi(tbox->tbox->buf) - 1);
@@ -197,7 +197,7 @@ int button_last_event(gp_widget_event *ev)
 	return 0;
 }
 
-int textbox_search_event(gp_widget_event *ev)
+int tbox_search_event(gp_widget_event *ev)
 {
 	struct document *doc = controls.doc;
 	gp_widget *tbox = ev->self;
@@ -312,7 +312,7 @@ int main(int argc, char *argv[])
 	controls.doc = &doc;
 	controls.page = gp_widget_by_uid(uids, "page", GP_WIDGET_PIXMAP);
 	controls.pg_cnt = gp_widget_by_uid(uids, "pg_cnt", GP_WIDGET_LABEL);
-	controls.pg_nr = gp_widget_by_uid(uids, "pg_nr", GP_WIDGET_TEXTBOX);
+	controls.pg_nr = gp_widget_by_uid(uids, "pg_nr", GP_WIDGET_TBOX);
 
 	gp_widget_label_printf(controls.pg_cnt, "of %i", doc.page_count);
 
