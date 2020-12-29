@@ -153,11 +153,16 @@ int load_page_event(gp_widget_event *ev)
 	case GP_WIDGET_EVENT_NEW:
 		tbox->tbox->filter = GP_TBOX_FILTER_INT;
 	break;
-	case GP_WIDGET_EVENT_ACTION:
-		load_page_and_redraw(atoi(tbox->tbox->buf) - 1);
+	case GP_WIDGET_EVENT_WIDGET:
+		switch (ev->sub_type) {
+		case GP_WIDGET_TBOX_TRIGGER:
+			load_page_and_redraw(atoi(tbox->tbox->buf) - 1);
+		break;
+		case GP_WIDGET_TBOX_FILTER:
+			return page_number_check(ev);
+		break;
+		}
 	break;
-	case GP_WIDGET_EVENT_FILTER:
-		return page_number_check(ev);
 	default:
 		return 0;
 	}
@@ -167,7 +172,7 @@ int load_page_event(gp_widget_event *ev)
 
 int button_prev_event(gp_widget_event *ev)
 {
-	if (ev->type == GP_WIDGET_EVENT_ACTION)
+	if (ev->type == GP_WIDGET_EVENT_WIDGET)
 		load_and_redraw(controls.doc, -1);
 
 	return 0;
@@ -175,7 +180,7 @@ int button_prev_event(gp_widget_event *ev)
 
 int button_next_event(gp_widget_event *ev)
 {
-	if (ev->type == GP_WIDGET_EVENT_ACTION)
+	if (ev->type == GP_WIDGET_EVENT_WIDGET)
 		load_and_redraw(controls.doc, 1);
 
 	return 0;
@@ -183,7 +188,7 @@ int button_next_event(gp_widget_event *ev)
 
 int button_first_event(gp_widget_event *ev)
 {
-	if (ev->type == GP_WIDGET_EVENT_ACTION)
+	if (ev->type == GP_WIDGET_EVENT_WIDGET)
 		load_page_and_redraw(0);
 
 	return 0;
@@ -191,7 +196,7 @@ int button_first_event(gp_widget_event *ev)
 
 int button_last_event(gp_widget_event *ev)
 {
-	if (ev->type == GP_WIDGET_EVENT_ACTION)
+	if (ev->type == GP_WIDGET_EVENT_WIDGET)
 		load_page_and_redraw(controls.doc->page_count - 1);
 
 	return 0;
@@ -202,7 +207,10 @@ int tbox_search_event(gp_widget_event *ev)
 	struct document *doc = controls.doc;
 	gp_widget *tbox = ev->self;
 
-	if (ev->type != GP_WIDGET_EVENT_ACTION)
+	if (ev->type != GP_WIDGET_EVENT_WIDGET)
+		return 0;
+
+	if (ev->sub_type != GP_WIDGET_TBOX_TRIGGER)
 		return 0;
 
 	fz_rect page_bbox = fz_bound_page(doc->fz_ctx, doc->fz_pg);
