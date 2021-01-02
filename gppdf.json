@@ -4,7 +4,7 @@
  "rfill": "0, 1",
  "widgets": [
   {
-   "cols": 8,
+   "cols": 9,
    "halign": "left",
    "border": "none",
    "widgets": [
@@ -48,6 +48,11 @@
      "type": "tbox",
      "size": 10,
      "on_event": "tbox_search_event"
+    },
+    {
+     "type": "button",
+     "label": "open",
+     "on_event": "button_open_file"
     }
    ]
   },

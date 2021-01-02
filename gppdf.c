@@ -202,6 +202,31 @@ int button_last_event(gp_widget_event *ev)
 	return 0;
 }
 
+static void update_doc_widgets(void)
+{
+	gp_widget_label_printf(controls.pg_cnt, "of %i", controls.doc->page_count);
+}
+
+int button_open_file(gp_widget_event *ev)
+{
+	gp_widget_dialog *dialog;
+
+	if (ev->type != GP_WIDGET_EVENT_WIDGET)
+		return 0;
+
+	dialog = gp_widget_dialog_file_open_new(NULL);
+	if (gp_widget_dialog_run(dialog) == GP_WIDGET_DIALOG_PATH)
+		load_document(controls.doc, gp_widget_dialog_file_open_path(dialog));
+
+	update_doc_widgets();
+	gp_widget_redraw(controls.page);
+	gp_widget_pixmap_update(controls.page);
+
+	gp_widget_dialog_free(dialog);
+
+	return 0;
+}
+
 int tbox_search_event(gp_widget_event *ev)
 {
 	struct document *doc = controls.doc;
@@ -322,7 +347,7 @@ int main(int argc, char *argv[])
 	controls.pg_cnt = gp_widget_by_uid(uids, "pg_cnt", GP_WIDGET_LABEL);
 	controls.pg_nr = gp_widget_by_uid(uids, "pg_nr", GP_WIDGET_TBOX);
 
-	gp_widget_label_printf(controls.pg_cnt, "of %i", doc.page_count);
+	update_doc_widgets();
 
 	gp_widget_event_unmask(controls.page, GP_WIDGET_EVENT_RESIZE);
 	gp_widget_event_unmask(controls.page, GP_WIDGET_EVENT_REDRAW);
