@@ -2,11 +2,12 @@
  "rows": 2,
  "align": "fill",
  "rfill": "0, 1",
+ "border": "none",
+ "pad": 0,
  "widgets": [
   {
    "cols": 9,
    "halign": "left",
-   "border": "none",
    "widgets": [
     {
      "type": "button",
