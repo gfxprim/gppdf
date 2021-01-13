@@ -12,22 +12,22 @@
    "widgets": [
     {
      "type": "button",
-     "label": "<<",
+     "btype": "first",
      "on_event": "button_first_event"
     },
     {
      "type": "button",
-     "label": "<",
+     "btype": "prev",
      "on_event": "button_prev_event"
     },
     {
      "type": "button",
-     "label": ">",
+     "btype": "next",
      "on_event": "button_next_event"
     },
     {
      "type": "button",
-     "label": ">>",
+     "btype": "last",
      "on_event": "button_last_event"
     },
     {
@@ -53,7 +53,8 @@
     },
     {
      "type": "button",
-     "label": "open",
+     "label": "Open",
+     "btype": "open",
      "on_event": "button_open_file"
     }
    ]
