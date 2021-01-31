@@ -37,7 +37,7 @@
     {
      "type": "tbox",
      "text": "1",
-     "size": "3",
+     "len": "4",
      "uid": "pg_nr",
      "on_event": "load_page_event"
     },
@@ -48,7 +48,7 @@
     },
     {
      "type": "tbox",
-     "size": 10,
+     "len": 10,
      "on_event": "tbox_search_event"
     },
     {
