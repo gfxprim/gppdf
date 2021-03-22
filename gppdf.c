@@ -26,17 +26,18 @@ static struct controls {
 	struct document *doc;
 } controls;
 
-static void draw_page(gp_widget_event *ev)
+static void draw_page(void)
 {
-	gp_widget *self = ev->self;
+	gp_widget *self = controls.page;
 	gp_pixmap *pixmap = self->pixmap->pixmap;
+	const gp_widget_render_ctx *ctx = gp_widgets_render_ctx();
 
 	GP_DEBUG(1, "Redrawing canvas %ux%u", pixmap->w, pixmap->h);
 
 	struct document *doc = controls.doc;
 
 	if (!doc->fz_ctx) {
-		gp_fill(pixmap, ev->ctx->fg_color);
+		gp_fill(pixmap, ctx->fg_color);
 		return;
 	}
 
@@ -62,7 +63,7 @@ static void draw_page(gp_widget_event *ev)
 	GP_DEBUG(1, "Blitting context");
 	gp_pixmap page;
 	//TODO: Fill only the corners
-	gp_fill(pixmap, ev->ctx->bg_color);
+	gp_fill(pixmap, ctx->bg_color);
 
 	gp_pixmap_init(&page, pix->w, pix->h, GP_PIXEL_RGB888, pix->samples);
 
@@ -87,6 +88,9 @@ static void load_page(struct document *doc, int page)
 
 	doc->cur_page = page;
 	doc->fz_pg = fz_load_page(doc->fz_ctx, doc->fz_doc, doc->cur_page);
+
+	if (controls.page)
+		draw_page();
 
 	gp_widget_tbox_printf(controls.pg_nr, "%i", doc->cur_page+1);
 }
@@ -124,14 +128,12 @@ static void load_and_redraw(struct document *doc, int i)
 {
 	load_next_page(doc, i);
 	gp_widget_redraw(controls.page);
-	gp_widget_pixmap_update(controls.page);
 }
 
 static void load_page_and_redraw(int page)
 {
 	load_page(controls.doc, page);
 	gp_widget_redraw(controls.page);
-	gp_widget_pixmap_update(controls.page);
 }
 
 static int page_number_check(gp_widget_event *ev)
@@ -220,7 +222,6 @@ int button_open_file(gp_widget_event *ev)
 
 	update_doc_widgets();
 	gp_widget_redraw(controls.page);
-	gp_widget_pixmap_update(controls.page);
 
 	gp_widget_dialog_free(dialog);
 
@@ -283,10 +284,7 @@ int pixmap_on_event(gp_widget_event *ev)
 	switch (ev->type) {
 	case GP_WIDGET_EVENT_RESIZE:
 		allocate_backing_pixmap(ev);
-		draw_page(ev);
-	break;
-	case GP_WIDGET_EVENT_REDRAW:
-		draw_page(ev);
+		draw_page();
 	break;
 	default:
 	break;
@@ -350,7 +348,6 @@ int main(int argc, char *argv[])
 	update_doc_widgets();
 
 	gp_widget_event_unmask(controls.page, GP_WIDGET_EVENT_RESIZE);
-	gp_widget_event_unmask(controls.page, GP_WIDGET_EVENT_REDRAW);
 
 	controls.page->on_event = pixmap_on_event;
 
