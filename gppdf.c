@@ -211,19 +211,19 @@ static void update_doc_widgets(void)
 
 int button_open_file(gp_widget_event *ev)
 {
-	gp_widget_dialog *dialog;
+	gp_dialog *dialog;
 
 	if (ev->type != GP_WIDGET_EVENT_WIDGET)
 		return 0;
 
-	dialog = gp_widget_dialog_file_open_new(NULL);
-	if (gp_widget_dialog_run(dialog) == GP_WIDGET_DIALOG_PATH)
-		load_document(controls.doc, gp_widget_dialog_file_open_path(dialog));
+	dialog = gp_dialog_file_open_new(NULL);
+	if (gp_dialog_run(dialog) == GP_WIDGET_DIALOG_PATH)
+		load_document(controls.doc, gp_dialog_file_open_path(dialog));
 
 	update_doc_widgets();
 	gp_widget_redraw(controls.page);
 
-	gp_widget_dialog_free(dialog);
+	gp_dialog_free(dialog);
 
 	return 0;
 }
