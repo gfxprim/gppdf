@@ -327,7 +327,7 @@ static int app_ev_callback(gp_event *ev)
 
 int main(int argc, char *argv[])
 {
-	void *uids;
+	gp_htable *uids;
 	struct document doc = {};
 
 	gp_widgets_register_callback(app_ev_callback);
