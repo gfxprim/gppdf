@@ -306,11 +306,13 @@ static int app_ev_callback(gp_event *ev)
 		case GP_KEY_RIGHT:
 		case GP_KEY_PAGE_DOWN:
 		case GP_KEY_DOWN:
+		case GP_KEY_SPACE:
 			load_and_redraw(doc, 1);
 		break;
 		case GP_KEY_LEFT:
 		case GP_KEY_UP:
 		case GP_KEY_PAGE_UP:
+		case GP_KEY_BACKSPACE:
 			load_and_redraw(doc, -1);
 		break;
 		//case GP_KEY_F:
