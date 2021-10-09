@@ -218,7 +218,7 @@ int button_open_file(gp_widget_event *ev)
 
 	dialog = gp_dialog_file_open_new(NULL);
 	if (gp_dialog_run(dialog) == GP_WIDGET_DIALOG_PATH)
-		load_document(controls.doc, gp_dialog_file_open_path(dialog));
+		load_document(controls.doc, gp_dialog_file_path(dialog));
 
 	update_doc_widgets();
 	gp_widget_redraw(controls.page);
