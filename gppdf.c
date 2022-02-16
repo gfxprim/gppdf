@@ -65,7 +65,7 @@ static void draw_page(void)
 	//TODO: Fill only the corners
 	gp_fill(pixmap, ctx->bg_color);
 
-	gp_pixmap_init(&page, pix->w, pix->h, GP_PIXEL_RGB888, pix->samples);
+	gp_pixmap_init(&page, pix->w, pix->h, GP_PIXEL_RGB888, pix->samples, 0);
 
 	controls.x_off = (pixmap->w - page.w)/2;
 	controls.y_off = (pixmap->h - page.h)/2;
