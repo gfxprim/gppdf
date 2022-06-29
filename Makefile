@@ -3,23 +3,11 @@ LDLIBS=-lgfxprim $(shell gfxprim-config --libs-widgets) -lmupdf
 
 OS=$(shell grep '^ID=' '/etc/os-release')
 
-ifeq ($(OS), ID=debian)
-HACK=1
+ifeq ($(OS), ID=gentoo)
+NO_HACK=1
 endif
 
-ifeq ($(OS), ID=raspbian)
-HACK=1
-endif
-
-ifeq ($(OS), ID=ubuntu)
-HACK=1
-endif
-
-ifeq ($(OS), ID=opensuse)
-HACK=1
-endif
-
-ifdef HACK
+ifndef NO_HACK
 $(info Hacking around static devel libraries for libmupdf!)
 LDLIBS+=-lmupdf-third -lm
 # libfreetype6
