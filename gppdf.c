@@ -1,11 +1,12 @@
 //SPDX-License-Identifier: GPL-2.1-or-later
 /*
 
-   Copyright (C) 2007-2020 Cyril Hrubis <metan@ucw.cz>
+   Copyright (C) 2007-2022 Cyril Hrubis <metan@ucw.cz>
 
  */
 
 #include <widgets/gp_widgets.h>
+#include <filters/gp_point.h>
 #include <mupdf/fitz.h>
 
 struct document {
@@ -69,6 +70,9 @@ static void draw_page(void)
 
 	controls.x_off = (pixmap->w - page.w)/2;
 	controls.y_off = (pixmap->h - page.h)/2;
+
+	if (ctx->color_scheme == GP_WIDGET_COLOR_SCHEME_DARK)
+		gp_filter_invert(&page, &page, NULL);
 
 	gp_blit(&page, 0, 0, page.w, page.h, pixmap, controls.x_off, controls.y_off);
 
@@ -279,11 +283,12 @@ static void allocate_backing_pixmap(gp_widget_event *ev)
 
 int pixmap_on_event(gp_widget_event *ev)
 {
-	gp_widget_event_dump(ev);
-
 	switch (ev->type) {
 	case GP_WIDGET_EVENT_RESIZE:
 		allocate_backing_pixmap(ev);
+		draw_page();
+	break;
+	case GP_WIDGET_EVENT_COLOR_SCHEME:
 		draw_page();
 	break;
 	default:
@@ -349,6 +354,7 @@ int main(int argc, char *argv[])
 
 	update_doc_widgets();
 
+	gp_widget_event_unmask(controls.page, GP_WIDGET_EVENT_COLOR_SCHEME);
 	gp_widget_event_unmask(controls.page, GP_WIDGET_EVENT_RESIZE);
 
 	controls.page->on_event = pixmap_on_event;
