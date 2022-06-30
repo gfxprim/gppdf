@@ -1,13 +1,7 @@
 CFLAGS=-W -Wall -Wextra -O2 $(shell gfxprim-config --cflags)
 LDLIBS=-lgfxprim $(shell gfxprim-config --libs-widgets) -lmupdf
 
-OS=$(shell grep '^ID=' '/etc/os-release')
-
-ifeq ($(OS), ID=gentoo)
-NO_HACK=1
-endif
-
-ifndef NO_HACK
+ifdef HACK
 $(info Hacking around static devel libraries for libmupdf!)
 LDLIBS+=-lmupdf-third -lm
 # libfreetype6
