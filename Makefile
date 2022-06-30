@@ -1,9 +1,9 @@
 CFLAGS=-W -Wall -Wextra -O2 $(shell gfxprim-config --cflags)
 LDLIBS=-lgfxprim $(shell gfxprim-config --libs-widgets) -lmupdf
 
-ifdef HACK
+ifdef static
 $(info Hacking around static devel libraries for libmupdf!)
-LDLIBS+=-lmupdf-third -lm
+LDLIBS+=-lm -lmujs
 # libfreetype6
 LDLIBS+=$(shell pkg-config --libs freetype2)
 LDLIBS+=$(shell pkg-config --libs zlib)

@@ -1,0 +1,11 @@
+To compile on Debian install following packages:
+
+libjbig2dec0-dev
+libfreetype-dev
+libmujs-dev
+libmupdf-dev
+libjpeg-dev
+libharfbuzz-dev
+libopenjp2-7-dev
+
+And compile with make static=1
