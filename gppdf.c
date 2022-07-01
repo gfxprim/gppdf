@@ -142,16 +142,47 @@ static void load_page(struct document *doc, int page)
 
 static int load_document(struct document *doc, const char *filename)
 {
-	fz_context *ctx = fz_new_context(NULL, NULL, FZ_STORE_DEFAULT);
+	fz_context *f_ctx;
 
-	if (!ctx)
+	if (doc->fz_doc) {
+		fz_drop_document(doc->fz_ctx, doc->fz_doc);
+		doc->fz_doc = NULL;
+	}
+
+	if (doc->fz_ctx) {
+		fz_drop_context(doc->fz_ctx);
+		doc->fz_ctx = NULL;
+	}
+
+	f_ctx = fz_new_context(NULL, NULL, FZ_STORE_DEFAULT);
+	if (!f_ctx)
 		return 1;
 
-	fz_register_document_handlers(ctx);
+	fz_try(f_ctx) {
+		fz_register_document_handlers(f_ctx);
+	}
+	fz_catch(f_ctx) {
+		gp_dialog_msg_printf_run(GP_DIALOG_MSG_ERR,
+		                         "Failed to register document handlers",
+		                         "%s", fz_caught_message(f_ctx));
+		fz_drop_context(f_ctx);
+		return 1;
+	}
 
-	doc->fz_ctx = ctx;
-	doc->fz_doc = fz_open_document(ctx, (char*)filename);
-	doc->page_count = fz_count_pages(ctx, doc->fz_doc);
+	fz_try(f_ctx) {
+		doc->fz_doc = fz_open_document(f_ctx, (char*)filename);
+	}
+	fz_catch(f_ctx) {
+		gp_dialog_msg_printf_run(GP_DIALOG_MSG_ERR,
+		                         "Failed to open document",
+		                         "%s", fz_caught_message(f_ctx));
+		fz_drop_context(f_ctx);
+		return 1;
+	}
+
+	doc->fz_ctx = f_ctx;
+
+	doc->page_count = fz_count_pages(doc->fz_ctx, doc->fz_doc);
 	doc->cur_page = -1;
 
 	gp_widget_label_printf(controls.pg_cnt, "of %i", controls.doc->page_count);
