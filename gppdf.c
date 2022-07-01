@@ -7,11 +7,22 @@
 
 #include <widgets/gp_widgets.h>
 #include <filters/gp_point.h>
+#include <filters/gp_rotate.h>
 #include <mupdf/fitz.h>
+
+enum orientation {
+	ROTATE_0,
+	ROTATE_90,
+	ROTATE_180,
+	ROTATE_270,
+};
 
 struct document {
 	int page_count;
 	int cur_page;
+
+	enum orientation orientation;
+
 	fz_matrix page_transform;
 	fz_context *fz_ctx;
 	fz_document *fz_doc;
@@ -48,9 +59,22 @@ static void draw_page(void)
 	GP_DEBUG(1, "Page bounding box %fx%f - %fx%f",
 	         rect.x0, rect.y0, rect.x1, rect.y1);
 
+	gp_size w = gp_pixmap_w(pixmap);
+	gp_size h = gp_pixmap_h(pixmap);
+
+	switch (doc->orientation) {
+	case ROTATE_0:
+	case ROTATE_180:
+	break;
+	case ROTATE_90:
+	case ROTATE_270:
+		GP_SWAP(w, h);
+	break;
+	}
+
 	// Find ZOOM fit size
-	float x_rat = 1.00 * pixmap->w / (rect.x1 - rect.x0);
-	float y_rat = 1.00 * pixmap->h / (rect.y1 - rect.y0);
+	float x_rat = 1.00 * w / (rect.x1 - rect.x0);
+	float y_rat = 1.00 * h / (rect.y1 - rect.y0);
 	float rat = GP_MIN(x_rat, y_rat);
 
 	doc->page_transform = fz_scale(rat, rat);
@@ -63,18 +87,33 @@ static void draw_page(void)
 	// Blit the pixmap
 	GP_DEBUG(1, "Blitting context");
 	gp_pixmap page;
+
 	//TODO: Fill only the corners
 	gp_fill(pixmap, ctx->bg_color);
 
 	gp_pixmap_init(&page, pix->w, pix->h, GP_PIXEL_RGB888, pix->samples, 0);
 
-	controls.x_off = (pixmap->w - page.w)/2;
-	controls.y_off = (pixmap->h - page.h)/2;
+	switch (doc->orientation) {
+	case ROTATE_0:
+	break;
+	case ROTATE_90:
+		gp_pixmap_rotate_cw(&page);
+	/* fallthrough */
+	case ROTATE_180:
+		gp_pixmap_rotate_cw(&page);
+	/* fallthrough */
+	case ROTATE_270:
+		gp_pixmap_rotate_cw(&page);
+	break;
+	}
+
+	controls.x_off = (pixmap->w - gp_pixmap_w(&page))/2;
+	controls.y_off = (pixmap->h - gp_pixmap_h(&page))/2;
 
 	if (ctx->color_scheme == GP_WIDGET_COLOR_SCHEME_DARK)
 		gp_filter_invert(&page, &page, NULL);
 
-	gp_blit(&page, 0, 0, page.w, page.h, pixmap, controls.x_off, controls.y_off);
+	gp_blit_clipped(&page, 0, 0, gp_pixmap_w(&page), gp_pixmap_h(&page), pixmap, controls.x_off, controls.y_off);
 
 	fz_drop_pixmap(doc->fz_ctx, pix);
 }
@@ -298,6 +337,52 @@ int pixmap_on_event(gp_widget_event *ev)
 	return 0;
 }
 
+static void do_rotate_cw(void)
+{
+	struct document *doc = controls.doc;
+
+	if (doc->orientation == ROTATE_270)
+		doc->orientation = ROTATE_0;
+	else
+		doc->orientation++;
+
+	draw_page();
+	gp_widget_redraw(controls.page);
+}
+
+static void do_rotate_ccw(void)
+{
+	struct document *doc = controls.doc;
+
+	if (doc->orientation == ROTATE_0)
+		doc->orientation = ROTATE_270;
+	else
+		doc->orientation--;
+
+	draw_page();
+	gp_widget_redraw(controls.page);
+}
+
+int rotate_cw(gp_widget_event *ev)
+{
+	if (ev->type != GP_WIDGET_EVENT_WIDGET)
+		return 0;
+
+	do_rotate_cw();
+
+	return 1;
+}
+
+int rotate_ccw(gp_widget_event *ev)
+{
+	if (ev->type != GP_WIDGET_EVENT_WIDGET)
+		return 0;
+
+	do_rotate_ccw();
+
+	return 1;
+}
+
 static int app_ev_callback(gp_event *ev)
 {
 	struct document *doc = controls.doc;
@@ -319,6 +404,9 @@ static int app_ev_callback(gp_event *ev)
 		case GP_KEY_PAGE_UP:
 		case GP_KEY_BACKSPACE:
 			load_and_redraw(doc, -1);
+		break;
+		case GP_KEY_R:
+			do_rotate_cw();
 		break;
 		//case GP_KEY_F:
 		//	toggle_fullscreen();

@@ -8,7 +8,7 @@
   "pad": 0,
   "widgets": [
    {
-    "cols": 9,
+    "cols": 12,
     "halign": "left",
     "widgets": [
      {
@@ -51,6 +51,20 @@
       "type": "tbox",
       "len": 10,
       "on_event": "tbox_search_event"
+     },
+     {
+      "type": "spinbutton",
+      "choices": ["fit width", "fit page", "125%", "150%"]
+     },
+     {
+      "type": "button",
+      "btype": "rotate_cw",
+      "on_event": "rotate_cw"
+     },
+     {
+      "type": "button",
+      "btype": "rotate_ccw",
+      "on_event": "rotate_ccw"
      },
      {
       "type": "button",
