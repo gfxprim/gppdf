@@ -38,6 +38,8 @@ static struct controls {
 	struct document *doc;
 } controls;
 
+const char *file_path;
+
 static void draw_page(void)
 {
 	gp_widget *self = controls.page;
@@ -152,6 +154,8 @@ static int load_document(struct document *doc, const char *filename)
 	doc->page_count = fz_count_pages(ctx, doc->fz_doc);
 	doc->cur_page = -1;
 
+	gp_widget_label_printf(controls.pg_cnt, "of %i", controls.doc->page_count);
+
 	load_page(doc, 0);
 
 	return 0;
@@ -247,11 +251,6 @@ int button_last_event(gp_widget_event *ev)
 	return 0;
 }
 
-static void update_doc_widgets(void)
-{
-	gp_widget_label_printf(controls.pg_cnt, "of %i", controls.doc->page_count);
-}
-
 int button_open_file(gp_widget_event *ev)
 {
 	gp_dialog *dialog;
@@ -263,7 +262,6 @@ int button_open_file(gp_widget_event *ev)
 	if (gp_dialog_run(dialog) == GP_WIDGET_DIALOG_PATH)
 		load_document(controls.doc, gp_dialog_file_path(dialog));
 
-	update_doc_widgets();
 	gp_widget_redraw(controls.page);
 
 	gp_dialog_free(dialog);
@@ -420,18 +418,20 @@ static int app_ev_callback(gp_event *ev)
 	return 1;
 }
 
+static void app_init(int argc, char *argv[])
+{
+	if (!argc)
+		return;
+
+	load_document(controls.doc, argv[0]);
+}
+
 int main(int argc, char *argv[])
 {
 	gp_htable *uids;
 	struct document doc = {};
 
 	gp_widgets_register_callback(app_ev_callback);
-	gp_widgets_getopt(&argc, &argv);
-
-	if (argc && load_document(&doc, argv[0])) {
-		GP_WARN("Can't load document '%s'", argv[0]);
-		return 1;
-	}
 
 	gp_widget *layout = gp_app_layout_load("gppdf", &uids);
 
@@ -440,14 +440,12 @@ int main(int argc, char *argv[])
 	controls.pg_cnt = gp_widget_by_uid(uids, "pg_cnt", GP_WIDGET_LABEL);
 	controls.pg_nr = gp_widget_by_uid(uids, "pg_nr", GP_WIDGET_TBOX);
 
-	update_doc_widgets();
-
 	gp_widget_event_unmask(controls.page, GP_WIDGET_EVENT_COLOR_SCHEME);
 	gp_widget_event_unmask(controls.page, GP_WIDGET_EVENT_RESIZE);
 
 	controls.page->on_event = pixmap_on_event;
 
-	gp_widgets_main_loop(layout, "gppdf", NULL, 0, NULL);
+	gp_widgets_main_loop(layout, "gppdf", app_init, argc, argv);
 
 	return 0;
 }
