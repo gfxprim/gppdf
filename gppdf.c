@@ -38,8 +38,6 @@ static struct controls {
 	struct document *doc;
 } controls;
 
-const char *file_path;
-
 static void draw_page(void)
 {
 	gp_widget *self = controls.page;
