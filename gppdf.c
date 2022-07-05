@@ -113,7 +113,7 @@ static void draw_page(void)
 	if (ctx->color_scheme == GP_WIDGET_COLOR_SCHEME_DARK)
 		gp_filter_invert(&page, &page, NULL);
 
-	gp_blit_clipped(&page, 0, 0, gp_pixmap_w(&page), gp_pixmap_h(&page), pixmap, controls.x_off, controls.y_off);
+	gp_blit(&page, 0, 0, gp_pixmap_w(&page), gp_pixmap_h(&page), pixmap, controls.x_off, controls.y_off);
 
 	fz_drop_pixmap(doc->fz_ctx, pix);
 }
@@ -141,6 +141,7 @@ static void load_page(struct document *doc, int page)
 static int load_document(struct document *doc, const char *filename)
 {
 	fz_context *f_ctx;
+	char *password = NULL;
 
 	if (doc->fz_doc) {
 		fz_drop_document(doc->fz_ctx, doc->fz_doc);
@@ -163,8 +164,7 @@ static int load_document(struct document *doc, const char *filename)
 		gp_dialog_msg_printf_run(GP_DIALOG_MSG_ERR,
 		                         "Failed to register document handlers",
 		                         "%s", fz_caught_message(f_ctx));
-		fz_drop_context(f_ctx);
-		return 1;
+		goto err1;
 	}
 
 	fz_try(f_ctx) {
@@ -174,8 +174,27 @@ static int load_document(struct document *doc, const char *filename)
 		gp_dialog_msg_printf_run(GP_DIALOG_MSG_ERR,
 		                         "Failed to open document",
 		                         "%s", fz_caught_message(f_ctx));
-		fz_drop_context(f_ctx);
-		return 1;
+		goto err1;
+	}
+
+	if (fz_needs_password(f_ctx, doc->fz_doc)) {
+		int auth = 0;
+
+		while (!auth) {
+			password = gp_dialog_input_run("Password required");
+			if (!password)
+				goto err2;
+
+			auth = fz_authenticate_password(f_ctx, doc->fz_doc, password);
+
+			free(password);
+
+			if (!auth) {
+				gp_dialog_msg_printf_run(GP_DIALOG_MSG_ERR,
+				                         "Incorrect password",
+				                         "Incorrect password");
+			}
+		}
 	}
 
 	doc->fz_ctx = f_ctx;
@@ -188,6 +207,11 @@ static int load_document(struct document *doc, const char *filename)
 	load_page(doc, 0);
 
 	return 0;
+err2:
+	fz_drop_document(f_ctx, doc->fz_doc);
+err1:
+	fz_drop_context(f_ctx);
+	return 1;
 }
 
 static void load_next_page(struct document *doc, int i)
