@@ -319,6 +319,8 @@ int button_open_file(gp_widget_event *ev)
 
 	gp_dialog_free(dialog);
 
+	gp_widget_focus_set(controls.page);
+
 	return 0;
 }
 
