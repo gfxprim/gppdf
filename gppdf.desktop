@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=gppdf
+GenericName=PDF Document Viewer
+Version=1.0
+Comment=PDF Document Viewer
+Exec=gppdf
+Icon=/usr/share/gppdf/gppdf.png
+Terminal=false
+Type=Application
+Categories=Viewer;Office;

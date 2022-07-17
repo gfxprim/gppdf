@@ -3,4 +3,4 @@ A minimalistic and fast pdf viewer
 
 Based on mupdf library and gfxprim widgets.
 
-image::https://raw.githubusercontent.com/gfxprim/gppdf/master/gppdf.png["Screenshot"]
+image::https://raw.githubusercontent.com/gfxprim/gppdf/master/gppdf_screenshot.png["Screenshot"]
