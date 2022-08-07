@@ -86,6 +86,7 @@ static void draw_page(void)
 
 	// Blit the pixmap
 	GP_DEBUG(1, "Blitting context");
+	usleep(1000000);
 	gp_pixmap page;
 
 	//TODO: Fill only the corners
@@ -481,10 +482,24 @@ static void app_init(int argc, char *argv[])
 	load_document(controls.doc, argv[0]);
 }
 
+static gp_app_info app_info = {
+	.name = "gppdf",
+	.desc = "Minimalistic and fast PDF viewer",
+	.version = "1.0",
+	.license = "GPL-2.0-or-later",
+	.url = "http://github.com/gfxprim/gppdf",
+	.authors = (gp_app_info_author []) {
+		{.name = "Cyril Hrubis", .email = "metan@ucw.cz", .years = "2007-2022"},
+		{}
+	}
+};
+
 int main(int argc, char *argv[])
 {
 	gp_htable *uids;
 	struct document doc = {};
+
+	gp_app_info_set(&app_info);
 
 	gp_widgets_register_callback(app_ev_callback);
 
