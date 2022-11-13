@@ -312,7 +312,11 @@ int button_open_file(gp_widget_event *ev)
 	if (ev->type != GP_WIDGET_EVENT_WIDGET)
 		return 0;
 
-	dialog = gp_dialog_file_open_new(NULL);
+	gp_dialog_file_opts opts = {
+		.flags = GP_DIALOG_OPEN_FILE,
+	};
+
+	dialog = gp_dialog_file_open_new(NULL, &opts);
 	if (gp_dialog_run(dialog) == GP_WIDGET_DIALOG_PATH)
 		load_document(controls.doc, gp_dialog_file_path(dialog));
 
