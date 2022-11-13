@@ -240,7 +240,7 @@ static void load_page_and_redraw(int page)
 static int page_number_check(gp_widget_event *ev)
 {
 	gp_widget *tbox = ev->self;
-	int val = atoi(tbox->tbox->buf) * 10 + ev->val - '0';
+	int val = atoi(tbox->tbox->buf);
 
 	if (val <= 0 || val > controls.doc->page_count)
 		return 1;
@@ -255,22 +255,21 @@ int load_page_event(gp_widget_event *ev)
 	switch (ev->type) {
 	case GP_WIDGET_EVENT_NEW:
 		tbox->tbox->filter = GP_TBOX_FILTER_INT;
-	break;
+		return 1;
 	case GP_WIDGET_EVENT_WIDGET:
 		switch (ev->sub_type) {
 		case GP_WIDGET_TBOX_TRIGGER:
 			load_page_and_redraw(atoi(tbox->tbox->buf) - 1);
-		break;
-		case GP_WIDGET_TBOX_FILTER:
+			return 1;
+		case GP_WIDGET_TBOX_POST_FILTER:
 			return page_number_check(ev);
-		break;
 		}
 	break;
 	default:
-		return 0;
+	break;
 	}
 
-	return 1;
+	return 0;
 }
 
 int button_prev_event(gp_widget_event *ev)
