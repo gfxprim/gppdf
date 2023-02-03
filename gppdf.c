@@ -349,7 +349,11 @@ int tbox_search_event(gp_widget_event *ev)
 	int i, ret;
 	fz_quad hitbox[128];
 
-	ret = fz_search_stext_page(doc->fz_ctx, text, tbox->tbox->buf, hitbox, 128);
+	ret = fz_search_stext_page(doc->fz_ctx, text, tbox->tbox->buf,
+#if FZ_VERSION_MINOR >= 20
+	                           NULL,
+#endif
+			           hitbox, 128);
 
 	gp_pixmap *p = controls.page->pixmap->pixmap;
 
