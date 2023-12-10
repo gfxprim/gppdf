@@ -489,7 +489,7 @@ static void app_init(int argc, char *argv[])
 	load_document(controls.doc, argv[0]);
 }
 
-static gp_app_info app_info = {
+gp_app_info app_info = {
 	.name = "gppdf",
 	.desc = "Minimalistic and fast PDF viewer",
 	.version = "1.0",
@@ -506,8 +506,6 @@ int main(int argc, char *argv[])
 	gp_htable *uids;
 	struct document doc = {};
 
-	gp_app_info_set(&app_info);
-
 	gp_widgets_register_callback(app_ev_callback);
 
 	gp_widget *layout = gp_app_layout_load("gppdf", &uids);
@@ -522,7 +520,7 @@ int main(int argc, char *argv[])
 
 	controls.page->on_event = pixmap_on_event;
 
-	gp_widgets_main_loop(layout, "gppdf", app_init, argc, argv);
+	gp_widgets_main_loop(layout, app_init, argc, argv);
 
 	return 0;
 }
