@@ -515,8 +515,8 @@ int main(int argc, char *argv[])
 	controls.pg_cnt = gp_widget_by_uid(uids, "pg_cnt", GP_WIDGET_LABEL);
 	controls.pg_nr = gp_widget_by_uid(uids, "pg_nr", GP_WIDGET_TBOX);
 
-	gp_widget_event_unmask(controls.page, GP_WIDGET_EVENT_COLOR_SCHEME);
-	gp_widget_event_unmask(controls.page, GP_WIDGET_EVENT_RESIZE);
+	gp_widget_events_unmask(controls.page, GP_WIDGET_EVENT_COLOR_SCHEME |
+	                                       GP_WIDGET_EVENT_RESIZE);
 
 	controls.page->on_event = pixmap_on_event;
 
