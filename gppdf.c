@@ -41,7 +41,7 @@ static struct controls {
 static void draw_page(void)
 {
 	gp_widget *self = controls.page;
-	gp_pixmap *pixmap = self->pixmap->pixmap;
+	gp_pixmap *pixmap = gp_widget_pixmap_get(self);
 	const gp_widget_render_ctx *ctx = gp_widgets_render_ctx();
 
 	GP_DEBUG(1, "Redrawing canvas %ux%u", pixmap->w, pixmap->h);
@@ -239,8 +239,7 @@ static void load_page_and_redraw(int page)
 
 static int page_number_check(gp_widget_event *ev)
 {
-	gp_widget *tbox = ev->self;
-	int val = atoi(tbox->tbox->buf);
+	int val = atoi(gp_widget_tbox_text(ev->self));
 
 	if (val <= 0 || val > controls.doc->page_count)
 		return 1;
@@ -254,12 +253,12 @@ int load_page_event(gp_widget_event *ev)
 
 	switch (ev->type) {
 	case GP_WIDGET_EVENT_NEW:
-		tbox->tbox->filter = GP_TBOX_FILTER_INT;
+		gp_widget_tbox_filter_set(tbox, GP_TBOX_FILTER_INT);
 		return 1;
 	case GP_WIDGET_EVENT_WIDGET:
 		switch (ev->sub_type) {
 		case GP_WIDGET_TBOX_TRIGGER:
-			load_page_and_redraw(atoi(tbox->tbox->buf) - 1);
+			load_page_and_redraw(atoi(gp_widget_tbox_text(tbox)) - 1);
 			return 1;
 		case GP_WIDGET_TBOX_POST_FILTER:
 			return page_number_check(ev);
@@ -349,13 +348,13 @@ int tbox_search_event(gp_widget_event *ev)
 	int i, ret;
 	fz_quad hitbox[128];
 
-	ret = fz_search_stext_page(doc->fz_ctx, text, tbox->tbox->buf,
+	ret = fz_search_stext_page(doc->fz_ctx, text, gp_widget_tbox_text(tbox),
 #if FZ_VERSION_MINOR >= 20
 	                           NULL,
 #endif
 			           hitbox, 128);
 
-	gp_pixmap *p = controls.page->pixmap->pixmap;
+	gp_pixmap *p = gp_widget_pixmap_get(controls.page);
 
 	for (i = 0; i < ret; i++) {
 		unsigned int x0 = controls.x_off + hitbox[i].ul.x;
@@ -375,10 +374,9 @@ int tbox_search_event(gp_widget_event *ev)
 static void allocate_backing_pixmap(gp_widget_event *ev)
 {
 	gp_widget *w = ev->self;
+	gp_pixmap *new_pixmap = gp_pixmap_alloc(w->w, w->h, ev->ctx->pixel_type);
 
-	gp_pixmap_free(w->pixmap->pixmap);
-
-	w->pixmap->pixmap = gp_pixmap_alloc(w->w, w->h, ev->ctx->pixel_type);
+	gp_pixmap_free(gp_widget_pixmap_set(w, new_pixmap));
 }
 
 int pixmap_on_event(gp_widget_event *ev)
